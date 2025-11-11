@@ -2,7 +2,7 @@ name: Update Letterboxd JSON
 
 on:
   schedule:
-    - cron: '0 3 * * *' # daily at 03:00 UTC
+    - cron: '0 3 * * *' # every day 03:00 UTC
   workflow_dispatch:
 
 jobs:
@@ -10,21 +10,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Node
+
+      - name: Setup Node 18
         uses: actions/setup-node@v4
         with:
           node-version: 18
+
       - name: Install dependencies
-        run: npm install node-fetch@2 cheerio fs-extra
+        run: npm install cheerio fs-extra
+
       - name: Run scraper
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
         run: node update-letterboxd.js
-      - name: Commit JSON
+
+      - name: Commit updated JSON
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add vkworkofficial-movies.json
+          git add public/*.json
           git commit -m "Update Letterboxd JSON" || echo "No changes"
           git push
         env:
